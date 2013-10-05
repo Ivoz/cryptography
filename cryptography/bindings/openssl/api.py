@@ -17,8 +17,6 @@ import sys
 
 import cffi
 
-from cryptography.primitives import interfaces
-
 
 class API(object):
     """
@@ -81,7 +79,7 @@ class API(object):
         )
         evp_cipher = self.lib.EVP_get_cipherbyname(ciphername.encode("ascii"))
         assert evp_cipher != self.ffi.NULL
-        if isinstance(mode, interfaces.ModeWithInitializationVector):
+        if hasattr(mode, 'initialization_vector'):
             iv_nonce = mode.initialization_vector
         else:
             iv_nonce = self.ffi.NULL

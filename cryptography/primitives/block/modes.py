@@ -13,37 +13,43 @@
 
 from __future__ import absolute_import, division, print_function
 
-from cryptography.primitives import interfaces
+import os
+
+__all__ = [
+    "CBC",
+    "CFB",
+    "ECB",
+    "OFB",
+]
 
 
-class CBC(object):
-    name = "CBC"
+class Mode(object):
 
-    def __init__(self, initialization_vector):
-        super(CBC, self).__init__()
+    def __init__(self, name, cipher):
+        self.name = name
+        self.cipher = cipher
+
+
+class ModeWithIV(Mode):
+
+    def __init__(self, name, cipher, initialization_vector=None):
+        super(ModeWithIV, self).__init__(name, cipher)
+        if initialization_vector is None:
+            initialization_vector = os.urandom(cipher.block_size // 8)
         self.initialization_vector = initialization_vector
 
 
-class ECB(object):
-    name = "ECB"
+class CBC(ModeWithIV):
+    pass
 
 
-class OFB(object):
-    name = "OFB"
-
-    def __init__(self, initialization_vector):
-        super(OFB, self).__init__()
-        self.initialization_vector = initialization_vector
+class CFB(ModeWithIV):
+    pass
 
 
-class CFB(object):
-    name = "CFB"
-
-    def __init__(self, initialization_vector):
-        super(CFB, self).__init__()
-        self.initialization_vector = initialization_vector
+class ECB(Mode):
+    pass
 
 
-interfaces.ModeWithInitializationVector.register(CBC)
-interfaces.ModeWithInitializationVector.register(OFB)
-interfaces.ModeWithInitializationVector.register(CFB)
+class OFB(ModeWithIV):
+    pass

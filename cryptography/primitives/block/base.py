@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function
 from enum import Enum
 
 from cryptography.bindings import _default_api
+from cryptography.primitives import interfaces
 
 
 class _Operation(Enum):
@@ -30,6 +31,10 @@ class BlockCipher(object):
         if api is None:
             api = _default_api
 
+        if isinstance(cipher, interfaces.BlockCipher):
+            cipher = cipher()
+        if isinstance(mode, interfaces.Mode):
+            mode = mode(cipher)
         self.cipher = cipher
         self.mode = mode
         self._api = api

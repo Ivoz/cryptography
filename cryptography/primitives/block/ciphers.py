@@ -13,14 +13,21 @@
 
 from __future__ import absolute_import, division, print_function
 
+import os
+
+__all__ = [
+    "AES",
+]
+
 
 class AES(object):
-    name = "AES"
     block_size = 128
     key_sizes = set([128, 192, 256])
 
-    def __init__(self, key):
-        super(AES, self).__init__()
+    def __init__(self, name, key=None):
+        self.name = name
+        if key is None:
+            key = os.urandom(max(self.key_sizes) // 8)
         self.key = key
 
         # Verify that the key size matches the expected key size

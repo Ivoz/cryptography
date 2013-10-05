@@ -13,10 +13,38 @@
 
 from __future__ import absolute_import, division, print_function
 
-import abc
+__all__ = [
+    "Mode",
+    "BlockCipher",
+]
 
-import six
+from enum import Enum
+from cryptography.primitives.block import modes, ciphers
 
 
-class ModeWithInitializationVector(six.with_metaclass(abc.ABCMeta)):
-    pass
+class Mode(Enum):
+    CBC = modes.CBC
+    CFB = modes.CFB
+    ECB = modes.ECB
+    OFB = modes.OFB
+
+    def __call__(self, *args, **kwargs):
+        return self.value(self.name, *args, **kwargs)
+
+
+class Cipher(Enum):
+
+    def __call__(self, *args, **kwargs):
+        return self.value(self.name, *args, **kwargs)
+
+    @property
+    def key_sizes(self):
+        return self.value.key_sizes
+
+
+class BlockCipher(Cipher):
+    AES = ciphers.AES
+
+    @property
+    def block_size(self):
+        return self.value.block_size
