@@ -18,37 +18,63 @@ from enum import Enum
 from cryptography.bindings import _default_api
 
 
-class _Operation(Enum):
+class Operation(Enum):
     encrypt = 0
     decrypt = 1
 
 
 class BlockCipher(object):
-    def __init__(self, cipher, mode, api=None):
+    def __init__(self, cipher, mode, key, api=None):
         super(BlockCipher, self).__init__()
 
         if api is None:
             api = _default_api
 
-        self.cipher = cipher
-        self.mode = mode
         self._api = api
-        self._ctx = api.create_block_cipher_context(cipher, mode)
+        self._cipher = cipher
+        self._ctx = None
+        self.key = None
+        self._mode = mode
         self._operation = None
+
+    @property
+    def cipher(self):
+        return self._cipher
+
+    @property
+    def key_size(self):
+        return len(self.key) * 8
+
+    @property
+    def mode(self):
+        return self._mode
 
     @property
     def name(self):
         return "{0}-{1}-{2}".format(
-            self.cipher.name, self.cipher.key_size, self.mode.name,
+            self.cipher.name, self.key_size, self.mode.name,
         )
 
-    def encrypt(self, plaintext):
+    def initialize(self, operation=None):
+        if self.key_size not in self.cipher.key_sizes:
+            raise ValueError("Invalid key size ({0}) for {1}".format(
+                self.key_size, self.cipher.name
+            ))
+        if operation is None:
+            operation = self._operation
+        assert isinstance(operation, Operation)
+        if self._ctx is not None:
+            del self._ctx
+        self._ctx = self._api.create_block_cipher_context(self)
+
+    def process(self, plaintext):
         if self._ctx is None:
             raise ValueError("BlockCipher was already finalized")
 
         if self._operation is None:
-            self._operation = _Operation.encrypt
-        elif self._operation is not _Operation.encrypt:
+            raise ValueError("BlockCipher is not yet initialized")
+        # TODO: allow for decryption
+        elif self._operation is not Operation.encrypt:
             raise ValueError("BlockCipher cannot encrypt when the operation is"
                              " set to %s" % self._operation.name)
 
@@ -58,7 +84,7 @@ class BlockCipher(object):
         if self._ctx is None:
             raise ValueError("BlockCipher was already finalized")
 
-        if self._operation is _Operation.encrypt:
+        if self._operation is Operation.encrypt:
             result = self._api.finalize_encrypt_context(self._ctx)
         else:
             raise ValueError("BlockCipher cannot finalize the unknown "

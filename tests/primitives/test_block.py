@@ -13,7 +13,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-import binascii
+from binascii import unhexlify as dehex
 
 import pretend
 import pytest
@@ -25,23 +25,25 @@ from cryptography.primitives.block.base import _Operation
 class TestBlockCipher(object):
     def test_cipher_name(self, api):
         cipher = BlockCipher(
-            ciphers.AES(binascii.unhexlify(b"0" * 32)),
-            modes.CBC(binascii.unhexlify(b"0" * 32)),
+            ciphers.AES,
+            modes.CBC(dehex(b"0" * 32)),
+            dehex(b"0" * 32),
             api
         )
         assert cipher.name == "AES-128-CBC"
 
     def test_instantiate_without_api(self):
         cipher = BlockCipher(
-            ciphers.AES(binascii.unhexlify(b"0" * 32)),
-            modes.CBC(binascii.unhexlify(b"0" * 32))
+            ciphers.AES,
+            modes.CBC(dehex(b"0" * 32)),
+            dehex(b"0" * 32)
         )
         assert cipher.name == "AES-128-CBC"
 
     def test_use_after_finalize(self, api):
         cipher = BlockCipher(
-            ciphers.AES(binascii.unhexlify(b"0" * 32)),
-            modes.CBC(binascii.unhexlify(b"0" * 32)),
+            ciphers.AES,
+            modes.CBC(dehex(b"0" * 32)),
             api
         )
         cipher.encrypt(b"a" * 16)
@@ -53,8 +55,8 @@ class TestBlockCipher(object):
 
     def test_encrypt_with_invalid_operation(self, api):
         cipher = BlockCipher(
-            ciphers.AES(binascii.unhexlify(b"0" * 32)),
-            modes.CBC(binascii.unhexlify(b"0" * 32)),
+            ciphers.AES(dehex(b"0" * 32)),
+            modes.CBC(dehex(b"0" * 32)),
             api
         )
         cipher._operation = _Operation.decrypt
@@ -64,8 +66,8 @@ class TestBlockCipher(object):
 
     def test_finalize_with_invalid_operation(self, api):
         cipher = BlockCipher(
-            ciphers.AES(binascii.unhexlify(b"0" * 32)),
-            modes.CBC(binascii.unhexlify(b"0" * 32)),
+            ciphers.AES(dehex(b"0" * 32)),
+            modes.CBC(dehex(b"0" * 32)),
             api
         )
         cipher._operation = pretend.stub(name="wat")

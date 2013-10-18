@@ -90,19 +90,17 @@ class API(object):
         return (self.ffi.NULL !=
                 self.lib.EVP_get_cipherbyname(ciphername.encode("ascii")))
 
-    def create_block_cipher_context(self, cipher, mode):
+    def create_block_cipher_context(self, cipher):
         ctx = self.ffi.new("EVP_CIPHER_CTX *")
         res = self.lib.EVP_CIPHER_CTX_init(ctx)
         assert res != 0
         ctx = self.ffi.gc(ctx, self.lib.EVP_CIPHER_CTX_cleanup)
         # TODO: compute name using a better algorithm
-        ciphername = "{0}-{1}-{2}".format(
-            cipher.name, cipher.key_size, mode.name
-        ).lower()
+        ciphername = cipher.name.lower()
         evp_cipher = self.lib.EVP_get_cipherbyname(ciphername.encode("ascii"))
         assert evp_cipher != self.ffi.NULL
-        if isinstance(mode, interfaces.ModeWithInitializationVector):
-            iv_nonce = mode.initialization_vector
+        if isinstance(cipher.mode, interfaces.ModeWithInitializationVector):
+            iv_nonce = cipher.mode.initialization_vector
         else:
             iv_nonce = self.ffi.NULL
 

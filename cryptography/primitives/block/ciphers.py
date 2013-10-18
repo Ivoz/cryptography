@@ -13,42 +13,63 @@
 
 from __future__ import absolute_import, division, print_function
 
+from collections import namedtuple
 
-class AES(object):
-    name = "AES"
-    block_size = 128
-    key_sizes = frozenset([128, 192, 256])
+CipherDescription = namedtuple(
+    'CipherDescription',
+    ['name',
+     'block_size',
+     'key_sizes'])
 
-    def __init__(self, key):
-        super(AES, self).__init__()
-        self.key = key
-
-        # Verify that the key size matches the expected key size
-        if self.key_size not in self.key_sizes:
-            raise ValueError("Invalid key size ({0}) for {1}".format(
-                self.key_size, self.name
-            ))
-
-    @property
-    def key_size(self):
-        return len(self.key) * 8
+AES = CipherDescription(
+    name='AES',
+    block_size='128',
+    key_sizes=frozenset([128, 192, 256])
+)
 
 
-class Camellia(object):
-    name = "camellia"
-    block_size = 128
-    key_sizes = frozenset([128, 192, 256])
+Camellia = CipherDescription(
+    name='camellia',
+    block_size='128',
+    key_sizes=frozenset([128, 192, 256])
+)
 
-    def __init__(self, key):
-        super(Camellia, self).__init__()
-        self.key = key
 
-        # Verify that the key size matches the expected key size
-        if self.key_size not in self.key_sizes:
-            raise ValueError("Invalid key size ({0}) for {1}".format(
-                self.key_size, self.name
-            ))
-
-    @property
-    def key_size(self):
-        return len(self.key) * 8
+# class AES(object):
+#     name = "AES"
+#     block_size = 128
+#     key_sizes = frozenset([128, 192, 256])
+# 
+#     def __init__(self, key):
+#         super(AES, self).__init__()
+#         self.key = key
+# 
+#         # Verify that the key size matches the expected key size
+#         if self.key_size not in self.key_sizes:
+#             raise ValueError("Invalid key size ({0}) for {1}".format(
+#                 self.key_size, self.name
+#             ))
+# 
+#     @property
+#     def key_size(self):
+#         return len(self.key) * 8
+# 
+# 
+# class Camellia(object):
+#     name = "camellia"
+#     block_size = 128
+#     key_sizes = frozenset([128, 192, 256])
+# 
+#     def __init__(self, key):
+#         super(Camellia, self).__init__()
+#         self.key = key
+# 
+#         # Verify that the key size matches the expected key size
+#         if self.key_size not in self.key_sizes:
+#             raise ValueError("Invalid key size ({0}) for {1}".format(
+#                 self.key_size, self.name
+#             ))
+# 
+#     @property
+#     def key_size(self):
+#         return len(self.key) * 8
