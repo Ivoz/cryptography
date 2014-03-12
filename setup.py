@@ -125,6 +125,7 @@ setup(
     ],
 
     packages=find_packages(exclude=["tests", "tests.*"]),
+    namespace_packages=['cryptography'],
 
     install_requires=requirements,
     setup_requires=requirements,
